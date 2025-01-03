@@ -316,6 +316,22 @@ async function run() {
             }
         });
 
+        app.get('/api/get-pdf/:email', async (req, res) => {
+            try {
+                const { email } = req.params;
+        
+                // Find all documents with the provided email
+                const result = await generatedPDFs.find({ email: email }).toArray();
+        
+                res.json(result);
+        
+            } catch (error) {
+                console.error('Failed to get PDFs:', error);
+                res.status(500).json({ error: 'Failed to get PDFs' });
+            }
+        }
+        );
+
     
     } catch (e) {
         console.error(e);
