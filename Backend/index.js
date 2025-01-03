@@ -69,7 +69,50 @@ const upload = multer({
       }
 });
 
-  
+const visionModel = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash" 
+});
+
+
+async function extractAndConvertText(imageBuffer) {
+    const base64Image = imageBuffer.toString('base64');
+
+    const imagePart = {
+        inlineData: {
+            data: base64Image,
+            mimeType: "image/jpeg"
+        }
+    };
+
+    try {
+        const parts = [
+            {
+                text: "Extract the Banglish text from this image and respond with ONLY the extracted text, nothing else."
+            },
+            imagePart
+        ];
+
+        const result = await visionModel.generateContent(parts);
+        const response = await result.response;
+        const extractedText = response.text();
+        
+        // Then convert the extracted text to Bangla
+        const banglaText = await convert(extractedText);
+        
+        return {
+            originalText: extractedText,
+            convertedText: banglaText
+        };
+    } catch (error) {
+        console.error('Error processing image:', error);
+        if (error.message.includes('quota')) {
+            throw new Error('API quota exceeded. Please try again later.');
+        }
+        throw error;
+    }
+}
+
+
 app.use(cors({
     origin: '*',
     credentials: true
@@ -172,7 +215,7 @@ async function run() {
         const generatedPDFs = db.collection("generatedPDFs");
 
         app.post('/api/generate_pdf', async (req, res) => {
-    try {
+        try {
         const { text, email } = req.body;
         
         // Input validation
@@ -222,13 +265,56 @@ async function run() {
             data: pdfDocument
         });
 
+
+
+        
+
     } catch (error) {
         console.error('PDF generation error:', error);
         res.status(500).json({ 
             error: 'Failed to generate and save PDF metadata' 
         });
     }
-});
+        });
+
+        app.post('/api/convert-image', upload.single('image'), async (req, res) => {
+            try {
+                // Check if file exists
+                if (!req.file) {
+                    return res.status(400).json({ error: 'No image file provided' });
+                }
+        
+                // Check file type
+                if (!req.file.mimetype.startsWith('image/')) {
+                    return res.status(400).json({ error: 'File must be an image' });
+                }
+        
+                // Add file size check
+                if (req.file.size > 5 * 1024 * 1024) { // 5MB
+                    return res.status(400).json({ error: 'File size too large. Maximum size is 5MB' });
+                }
+        
+                const result = await extractAndConvertText(req.file.buffer);
+                console.log('Image conversion result:', result);
+                res.json(result);
+        
+            } catch (error) {
+                console.error('Image conversion error:', error);
+                
+                // More specific error messages
+                if (error.message.includes('quota')) {
+                    return res.status(429).json({
+                        error: 'API quota exceeded',
+                        details: 'Please try again later'
+                    });
+                }
+        
+                res.status(500).json({ 
+                    error: 'Failed to process image',
+                    details: error.message
+                });
+            }
+        });
 
     
     } catch (e) {
