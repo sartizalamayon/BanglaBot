@@ -61,6 +61,14 @@ const generationTitleConfig = {
     },
   };
 
+const storage = multer.memoryStorage();
+const upload = multer({ 
+      storage: storage,
+      limits: {
+          fileSize: 5 * 1024 * 1024 // 5MB limit
+      }
+});
+
   
 app.use(cors({
     origin: '*',
@@ -104,7 +112,6 @@ async function generateMetadata(text) {
 
     const result = await chatSession.sendMessage(text);
     res = result.response.text();
-    console.log(res);
     return res;
 }
   
@@ -163,47 +170,65 @@ async function run() {
         });
 
         const generatedPDFs = db.collection("generatedPDFs");
+
         app.post('/api/generate_pdf', async (req, res) => {
+    try {
+        const { text, email } = req.body;
+        
+        // Input validation
+        if (!text || !email) {
+            return res.status(400).json({ 
+                error: 'Both text and email are required' 
+            });
+        }
+
+        // Generate metadata using existing function
+        const metadataResponse = await generateMetadata(text);
+        
+        // Parse the metadata if it's a string
+        let metadata;
+        if (typeof metadataResponse === 'string') {
             try {
-                const { text, email } = req.body;
-                
-                // Input validation
-                if (!text || !email) {
-                    return res.status(400).json({ 
-                        error: 'Both text and email are required' 
-                    });
-                }
-        
-                // Generate metadata using existing function
-                const metadata = await generateMetadata(text);
-        
-                // Create document to insert
-                const pdfDocument = {
-                    email: email,
-                    text: text,
-                    title: metadata.title,
-                    caption: metadata.caption,
-                    filename: metadata.file_name,
-                    date: new Date(),
-                };
-        
-                // Insert into MongoDB
-                const result = await generatedPDFs.insertOne(pdfDocument);
-        
-                // Send success response
-                res.json({
-                    success: true,
-                    message: 'PDF metadata saved successfully',
-                    data: pdfDocument
-                });
-        
-            } catch (error) {
-                console.error('PDF generation error:', error);
-                res.status(500).json({ 
-                    error: 'Failed to generate and save PDF metadata' 
-                });
+                metadata = JSON.parse(metadataResponse);
+            } catch (e) {
+                console.error('Failed to parse metadata:', e);
+                return res.status(500).json({ error: 'Failed to parse metadata' });
             }
+        } else {
+            metadata = metadataResponse;
+        }
+
+        console.log('Parsed metadata:', metadata);  // Debug log
+
+        // Create document to insert
+        const pdfDocument = {
+            email: email,
+            text: text,
+            title: metadata.title || '',
+            caption: metadata.caption || '',
+            filename: metadata.file_name || '',  // Note: using file_name instead of filename to match the API response
+            date: new Date(),
+        };
+
+        console.log('Document to insert:', pdfDocument);  // Debug log
+
+        // Insert into MongoDB
+        const result = await generatedPDFs.insertOne(pdfDocument);
+
+        // Send success response
+        res.json({
+            success: true,
+            message: 'PDF metadata saved successfully',
+            data: pdfDocument
         });
+
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        res.status(500).json({ 
+            error: 'Failed to generate and save PDF metadata' 
+        });
+    }
+});
 
     
     } catch (e) {
