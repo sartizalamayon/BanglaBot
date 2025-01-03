@@ -101,7 +101,7 @@ async function extractAndConvertText(imageBuffer) {
         
         return {
             originalText: extractedText,
-            convertedText: banglaText
+            convertedText: JSON.parse(banglaText).convertedBangla
         };
     } catch (error) {
         console.error('Error processing image:', error);
