@@ -11,3 +11,10 @@
 {
   "text": "ami banglay gan gai"
 }
+
+### Response Body
+```json
+{
+  "convertedBangla": "আমি বাংলায় গান গাই"
+}
+```

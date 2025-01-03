@@ -37,7 +37,31 @@ const generationConfig = {
     },
 };
 
+const generationTitleConfig = {
+    temperature: 1.2,
+    responseMimeType: "application/json",
+    responseSchema: {
+      type: "object",
+      properties: {
+        title: {
+          type: "string"
+        },
+        caption: {
+          type: "string"
+        },
+        file_name: {
+          type: "string"
+        }
+      },
+      required: [
+        "title",
+        "caption",
+        "file_name"
+      ]
+    },
+  };
 
+  
 app.use(cors({
     origin: '*',
     credentials: true
@@ -60,6 +84,27 @@ async function convert(text) {
 
     const result = await chatSession.sendMessage(text);
     res = result.response.text();
+    return res;
+}
+
+async function generateMetadata(text) {
+    const chatSession = model.startChat({
+        generationConfig: generationTitleConfig,
+        history: [
+            {
+                role: "user",
+                parts: [
+                    {
+                        text: `The goal is to enable the model to generate an appropriate title, caption, and a possible file name for a given Bangla text or paragraph.`
+                    }
+                ]
+            }
+        ]
+    });
+
+    const result = await chatSession.sendMessage(text);
+    res = result.response.text();
+    console.log(res);
     return res;
 }
   
@@ -97,6 +142,69 @@ async function run() {
                 res.status(500).json({ error: 'Conversion failed' });
             }
         });
+
+
+        app.post('/api/generate-metadata', async (req, res) => {
+            try {
+                const { text } = req.body;
+                
+                if (!text) {
+                    return res.status(400).json({ error: 'Text is required' });
+                }
+        
+                const metadata = await generateMetadata(text);
+                
+                res.send( metadata );
+        
+            } catch (error) {
+                console.error('Metadata generation error:', error);
+                res.status(500).json({ error: 'Metadata generation failed' });
+            }
+        });
+
+        const generatedPDFs = db.collection("generatedPDFs");
+        app.post('/api/generate_pdf', async (req, res) => {
+            try {
+                const { text, email } = req.body;
+                
+                // Input validation
+                if (!text || !email) {
+                    return res.status(400).json({ 
+                        error: 'Both text and email are required' 
+                    });
+                }
+        
+                // Generate metadata using existing function
+                const metadata = await generateMetadata(text);
+        
+                // Create document to insert
+                const pdfDocument = {
+                    email: email,
+                    text: text,
+                    title: metadata.title,
+                    caption: metadata.caption,
+                    filename: metadata.file_name,
+                    date: new Date(),
+                };
+        
+                // Insert into MongoDB
+                const result = await generatedPDFs.insertOne(pdfDocument);
+        
+                // Send success response
+                res.json({
+                    success: true,
+                    message: 'PDF metadata saved successfully',
+                    data: pdfDocument
+                });
+        
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                res.status(500).json({ 
+                    error: 'Failed to generate and save PDF metadata' 
+                });
+            }
+        });
+
     
     } catch (e) {
         console.error(e);
