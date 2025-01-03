@@ -37,18 +37,88 @@ const model = genAI.getGenerativeModel({
 });
 
 
-const generationConfig = {
-    temperature: 1.25,
+const generationQuizConfig = {
+    temperature: 1.05,
     responseMimeType: "application/json",
     responseSchema: {
       type: "object",
       properties: {
-        convertedBangla: {
-          type: "string"
+        question_one: {
+          type: "object",
+          properties: {
+            question: { type: "string" },
+            answers: {
+              type: "object",
+              properties: {
+                option_a: { type: "string" },
+                option_b: { type: "string" },
+                option_c: { type: "string" },
+                option_d: { type: "string" },
+                correct_answer: { type: "string" }
+              },
+              required: ["option_a", "option_b", "option_c", "option_d", "correct_answer"]
+            }
+          },
+          required: ["question", "answers"]
+        },
+        question_two: {
+          type: "object",
+          properties: {
+            question: { type: "string" },
+            answers: {
+              type: "object",
+              properties: {
+                option_a: { type: "string" },
+                option_b: { type: "string" },
+                option_c: { type: "string" },
+                option_d: { type: "string" },
+                correct_answer: { type: "string" }
+              },
+              required: ["option_a", "option_b", "option_c", "option_d", "correct_answer"]
+            }
+          },
+          required: ["question", "answers"]
+        },
+        question_three: {
+          type: "object",
+          properties: {
+            question: { type: "string" },
+            answers: {
+              type: "object",
+              properties: {
+                option_a: { type: "string" },
+                option_b: { type: "string" },
+                option_c: { type: "string" },
+                option_d: { type: "string" },
+                correct_answer: { type: "string" }
+              },
+              required: ["option_a", "option_b", "option_c", "option_d", "correct_answer"]
+            }
+          },
+          required: ["question", "answers"]
+        },
+        question_four: {
+          type: "object",
+          properties: {
+            question: { type: "string" },
+            answers: {
+              type: "object",
+              properties: {
+                option_a: { type: "string" },
+                option_b: { type: "string" },
+                option_c: { type: "string" },
+                option_d: { type: "string" },
+                correct_answer: { type: "string" }
+              },
+              required: ["option_a", "option_b", "option_c", "option_d", "correct_answer"]
+            }
+          },
+          required: ["question", "answers"]
         }
-      }
-    },
-};
+      },
+      required: ["question_one", "question_two", "question_three", "question_four"]
+    }
+  };
 
 const generationTitleConfig = {
     temperature: 1.2,
@@ -578,7 +648,43 @@ app.get('/api/chat/history/:email', async (req, res) => {
             res.status(500).json({ error: 'Failed to get story' });
         }
     });
-    
+
+
+    // pdf -id -> story from the content
+    app.get('/api/generate-quiz/:id', async (req, res) => {
+        try {
+          const { id } = req.params;
+      
+          const result = await generatedPDFs.findOne({ _id: new ObjectId(id) });
+      
+          if (!result) {
+            return res.status(404).json({ error: 'PDF not found' });
+          }
+          
+          const pdfText = result.text;
+      
+          const quizSession = model.startChat({
+            generationConfig: generationQuizConfig,
+            history: [
+              {
+                role: "user",
+                parts: [
+                  {text: "Act as a professional quiz taker. I will give you a bangla text. Your job will be Genrate me a bangla quiz based on the text. There should be four questions. And For each question there will be only one correct answer. "},
+                ],
+              },
+            ],
+          });
+      
+          const resp = await quizSession.sendMessage("Give me a total of 4 questions and answers based on this text: " + pdfText);
+      
+          const quiz = JSON.parse(resp.response.text()); 
+          res.json(quiz);
+      
+        } catch (error) {
+          console.error('Failed to generate quiz:', error);
+          res.status(500).json({ error: 'Failed to generate quiz' });
+        }
+      });
     
     } catch (e) {
         console.error(e);
