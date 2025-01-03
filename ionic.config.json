@@ -1,0 +1,7 @@
+{
+  "name": "bitfest-2025",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

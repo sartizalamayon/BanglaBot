@@ -1,0 +1,138 @@
+.chat-content {
+  --background: #f5f5f5;
+}
+
+.pdf-upload-section {
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background: #e0e0e0;
+}
+
+.upload-button ion-icon {
+  font-size: 24px;
+  color: #666;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.messages-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.message-content {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.user-message .message-content {
+  background: #0084ff;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.bot-message .message-content {
+  background: white;
+  color: #333;
+  border-bottom-left-radius: 4px;
+}
+
+.timestamp {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+  display: block;
+}
+
+.user-message .timestamp {
+  text-align: right;
+}
+
+.chat-footer {
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 16px;
+}
+
+.input-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: white;
+}
+
+.chat-input {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 20px;
+  padding: 8px 16px;
+  margin: 0;
+  max-height: 120px;
+}
+
+.send-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin: 0;
+  height: 40px;
+}
+
+.send-button ion-icon {
+  font-size: 24px;
+  color: #0084ff;
+}
+
+/* Loading animation */
+.bot-message ion-spinner {
+  color: #666;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .message-content {
+    max-width: 85%;
+  }
+
+  .chat-footer {
+    padding: 8px;
+  }
+}

@@ -1,0 +1,364 @@
+/* Bangla Text Styling */
+@font-face {
+  font-family: 'SolaimanLipi';
+  src: url('https://cdn.jsdelivr.net/gh/mirazmac/solaimanlipi@master/fonts/SolaimanLipi.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/mirazmac/solaimanlipi@master/fonts/SolaimanLipi.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.dashboard-content {
+  --ion-background-color: #f5f7fa;
+  padding: 16px;
+}
+
+/* Statistics Cards */
+.stat-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background: white;
+  height: 100%;
+}
+
+.stat-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 12px;
+  background: var(--ion-color-primary-tint);
+  color: var(--ion-color-primary);
+}
+
+.stat-icon ion-icon {
+  font-size: 24px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: var(--ion-color-dark);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  text-align: center;
+  color: var(--ion-color-medium);
+}
+
+/* PDF List Card */
+.pdf-list-card {
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background: white;
+}
+
+.pdf-list-card ion-card-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.pdf-list-card ion-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin: 0;
+}
+
+.pdf-list-card ion-card-subtitle {
+  margin-top: 4px;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
+/* Search and Filter */
+.search-filter-container {
+  padding: 16px;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+  background: white;
+}
+
+.pdf-searchbar {
+  padding: 0;
+  margin: 0;
+  --box-shadow: none;
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  --placeholder-color: var(--ion-color-medium);
+  --icon-color: var(--ion-color-medium);
+}
+
+ion-segment {
+  margin-top: 12px;
+  --background: var(--ion-color-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+ion-segment-button {
+  --indicator-color: var(--ion-color-primary);
+  --color-checked: var(--ion-color-primary);
+  --color: var(--ion-color-medium);
+  min-height: 36px;
+  text-transform: none;
+  font-size: 13px;
+}
+
+/* PDF List */
+.pdf-list {
+  padding: 8px 0;
+}
+
+.pdf-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --inner-padding-end: 0;
+  --background: white;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.pdf-item:last-child {
+  border-bottom: none;
+}
+
+.pdf-title {
+  font-family: 'SolaimanLipi', Arial, sans-serif !important;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ion-color-dark);
+  margin: 0 0 8px 0;
+  padding: 0;
+  line-height: 1.6;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.pdf-text {
+  font-family: 'SolaimanLipi', Arial, sans-serif !important;
+  margin: 8px 0;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  display: block;
+  padding-right: 16px;
+}
+
+.pdf-meta {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 0 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pdf-date, .pdf-privacy {
+  margin: 0;
+  height: 24px;
+  font-size: 12px;
+  --background: var(--ion-color-light);
+  white-space: nowrap;
+}
+
+.pdf-caption {
+  font-family: 'SolaimanLipi', Arial, sans-serif !important;
+  margin: 8px 0 0;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.6;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.pdf-item ion-label {
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+.download-button {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  height: 36px;
+  margin: 0;
+  --color: var(--ion-color-primary);
+}
+
+/* Loading and Error States */
+.loading-container, .error-container, .empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: var(--ion-color-medium);
+}
+
+.loading-container ion-spinner {
+  margin-bottom: 16px;
+}
+
+.error-container {
+  color: var(--ion-color-danger);
+}
+
+.error-container ion-button {
+  margin-top: 16px;
+}
+
+/* Grid Adjustments */
+ion-grid {
+  padding: 0;
+}
+
+ion-row {
+  margin: 0 -8px;
+}
+
+ion-col {
+  padding: 8px;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .dashboard-content {
+    padding: 24px;
+  }
+
+  .pdf-list-card {
+    margin: 24px 0;
+  }
+
+  .stat-card {
+    margin: 0;
+  }
+
+  .pdf-text {
+    font-size: 14px;
+  }
+
+  .pdf-title {
+    font-size: 16px;
+  }
+
+  ion-row {
+    margin: 0 -12px;
+  }
+
+  ion-col {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 992px) {
+  .dashboard-content ion-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .dashboard-content {
+    padding: 32px;
+  }
+}
+
+/* Skeleton Loading */
+ion-skeleton-text {
+  --border-radius: 4px;
+}
+
+/* Toast Styling */
+ion-toast {
+  --border-radius: 8px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Bangla text styling */
+h2 {
+  font-family: 'SolaimanLipi', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+/* Add some hover effects */
+ion-item {
+  --background-hover: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+ion-item:hover {
+  --background: #f5f5f5;
+}
+
+/* Card animations */
+.stat-card ion-card-content {
+  transition: transform 0.2s ease;
+}
+
+.stat-card:active ion-card-content {
+  transform: scale(0.98);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  ion-card {
+    margin: 8px;
+  }
+}
+
+/* Translation Meta */
+.translation-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.translation-meta small {
+  color: #666;
+}
+
+.translation-meta ion-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Popular Phrases */
+.popular-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.popular-phrases ion-chip {
+  --background: transparent;
+  --color: var(--ion-color-primary);
+}
+
+.popular-phrases ion-badge {
+  margin-left: 8px;
+  padding: 4px 8px;
+}

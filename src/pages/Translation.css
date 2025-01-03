@@ -1,0 +1,287 @@
+.input-textarea {
+  border: 1px solid var(--ion-color-medium);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.output-textarea {
+  border: 1px solid var(--ion-color-medium);
+  border-radius: 8px;
+  background-color: var(--ion-color-light);
+}
+
+.editor-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.editor-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.editor-textarea {
+  flex: 1;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid var(--ion-color-medium);
+  resize: none;
+  width: 100%;
+  --padding-end: 48px; /* Make room for the camera button */
+}
+
+.bangla-text {
+  background: var(--ion-color-light-tint);
+  border-color: var(--ion-color-success);
+  font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
+  font-size: 1.1rem;
+}
+
+.editor-textarea:focus {
+  outline: none;
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--ion-color-primary-rgb), 0.2);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.word-count {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.editor-button {
+  min-width: 120px;
+}
+
+.floating-menu {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Alert styling */
+.custom-alert {
+  --background: #ffffff;
+  --height: auto;
+  --max-width: 90%;
+  --border-radius: 16px;
+}
+
+.custom-alert .alert-wrapper {
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.custom-alert .alert-head {
+  padding: 16px;
+}
+
+.custom-alert .alert-head h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.custom-alert .alert-message {
+  padding: 16px;
+  color: #666;
+}
+
+.custom-alert .alert-button-group {
+  padding: 8px;
+}
+
+.custom-alert .alert-button {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+}
+
+/* Loading states */
+.loading-progress {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.loading-container {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-skeleton {
+  height: 100px;
+  --border-radius: 8px;
+}
+
+.loading-text {
+  text-align: center;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+/* Disabled state styling */
+ion-textarea.editor-textarea[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Button loading state */
+.editor-button ion-spinner {
+  margin-right: 8px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading-skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .editor-container {
+    padding: 0.5rem;
+  }
+  
+  .editor-actions {
+    flex-direction: column;
+  }
+  
+  .editor-button {
+    width: 100%;
+  }
+}
+
+/* Camera functionality */
+.textarea-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.editor-textarea {
+  width: 100%;
+  --padding-end: 48px;
+}
+
+.camera-fab {
+  position: absolute !important;
+  margin: 0 !important;
+  right: 8px !important;
+  bottom: 8px !important;
+}
+
+.camera-fab ion-fab-button {
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --background-hover: var(--ion-color-primary-tint);
+  margin: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.camera-fab ion-icon {
+  font-size: 20px;
+  color: white;
+}
+
+/* Image preview */
+.image-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.preview-image {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+/* Modal styles */
+ion-modal {
+  --height: 80%;
+  --border-radius: 16px;
+}
+
+ion-modal ion-toolbar {
+  --background: transparent;
+}
+
+/* Disabled state for camera button */
+.camera-fab[disabled] {
+  opacity: 0.5;
+}

@@ -1,0 +1,10 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "bitfest-2025",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  }
+}
