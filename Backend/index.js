@@ -538,11 +538,14 @@ app.get('/api/chat/history/:email', async (req, res) => {
         res.status(500).json({ error: 'Failed to get chat history' });
     }
 });
+
+    
     
     } catch (e) {
         console.error(e);
     }
 }
+
 run().catch(console.dir);
 
 app.listen(port, '0.0.0.0', () => {
