@@ -2,7 +2,18 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const PDFDocument = require('pdfkit');
+const FormData = require('form-data');
+const pdfjsLib = require('pdf-parse');
 
+async function extractTextFromPDF(pdfBuffer) {
+    try {
+        const data = await pdfjsLib(pdfBuffer);
+        return data.text;
+    } catch (error) {
+        console.error('Error extracting text from PDF:', error);
+        throw new Error('Failed to extract text from PDF');
+    }
+}
 //
 const {
     GoogleGenerativeAI,
@@ -159,7 +170,25 @@ async function extractAndConvertText(imageBuffer) {
         throw error;
     }
 }
-  
+
+async function handleChat(input, context = "") {
+    const chatSession = model.startChat({
+        generationConfig: {
+            temperature: 1,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 8192,
+            responseMimeType: "text/plain",
+        },
+        history: context ? [{
+            role: "user", 
+            parts: [{ text: context }]
+        }] : []
+    });
+ 
+    const result = await chatSession.sendMessage(input);
+    return result.response.text();
+}
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -168,6 +197,26 @@ const client = new MongoClient(uri, {
       deprecationErrors: true,
     },
 });
+
+async function handleChat(input, history = []) {
+    const chatSession = model.startChat({
+        generationConfig: {
+            temperature: 1,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 8192
+        }
+    });
+
+    // If there's history, send previous messages first
+    for (const msg of history) {
+        await chatSession.sendMessage(msg.text);
+    }
+
+    // Send the current message
+    const result = await chatSession.sendMessage(`I want you to be a helpful AI assistant that responds in Bangla language, and here is my question/query: ${input}`);
+    return result.response.text();
+}
 
 async function run() {
     try {
@@ -403,10 +452,92 @@ async function run() {
                 res.status(500).json({ error: 'Failed to download PDF' });
             }
         });
+
+
+        app.get('/api/public/pdfs', async (req, res) => {
+            try {
+                const result = await generatedPDFs.find({ privacy: 'public' }).toArray();
+                res.json(result);
+            } catch (error) {
+                console.error('Failed to get public PDFs:', error);
+                res.status(500).json({ error: 'Failed to get public PDFs' });
+            }
+        });
+
+
+        //chatbot
+        const chatHistory = db.collection("chatHistory");
+        app.post('/api/chat', upload.single('file'), async (req, res) => {
+            try {
+                const { text, email } = req.body;
+                let input = text || '';
+                let context = '';
         
-
-
-
+                // Handle PDF file if present
+                if (req.file && req.file.mimetype === 'application/pdf') {
+                    const pdfText = await extractTextFromPDF(req.file.buffer);
+                    context = pdfText;
+                    input = `Based on this context: ${pdfText}\n\nQuestion: ${input}`;
+                }
+        
+                if (!input && !context) {
+                    return res.status(400).json({ 
+                        error: 'No input provided. Please provide text or upload a PDF file.' 
+                    });
+                }
+        
+                // Get user's chat history for context
+                const previousChats = await chatHistory.find({ email })
+                    .sort({ timestamp: -1 })
+                    .limit(5)  // Get last 5 conversations
+                    .toArray();
+        
+                // Simplify history structure
+                const history = previousChats.reverse().map(chat => ({
+                    text: chat.input + "\n Response: " + chat.response
+                }));
+        
+                // Get chat response
+                const response = await handleChat(input, history);
+        
+                // Store chat in database
+                await chatHistory.insertOne({
+                    timestamp: new Date(),
+                    email,
+                    input: input,
+                    response,
+                    context: context || null,
+                    inputType: req.file ? 'pdf' : 'text',
+                    fileName: req.file ? req.file.originalname : null
+                });
+        
+                res.json({
+                    success: true,
+                    response: response
+                });
+        
+            } catch (error) {
+                console.error('Chat error:', error);
+                res.status(500).json({ 
+                    error: 'Failed to process chat',
+                    details: error.message 
+                });
+            }
+        });
+        
+        
+        // Get chat history for a specific user
+app.get('/api/chat/history/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const history = await chatHistory.find({ email })
+            .sort({ timestamp: -1 })
+            .toArray();
+        res.json(history);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get chat history' });
+    }
+});
     
     } catch (e) {
         console.error(e);
