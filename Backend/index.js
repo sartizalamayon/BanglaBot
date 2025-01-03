@@ -190,6 +190,25 @@ async function handleChat(input, context = "") {
     return result.response.text();
 }
 
+async function makeStory(text) {
+    const chatSession = model.startChat({
+        generationConfig: {
+            temperature: 1,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 8192,
+            responseMimeType: "text/plain",
+        },
+        history: [{
+            role: "user",
+            parts: [{ text: text }]
+        }]
+    });
+
+    const result = await chatSession.sendMessage("Please generate a story based on this text. You can use your creativity to make it interesting. The story should be in English language. It should be a short story, not too long. There should be no line breaks or any character other than words in the story.");
+    return result.response.text();
+}
+
 const client = new MongoClient(uri, {
     serverApi: {
       version: ServerApiVersion.v1,
@@ -539,6 +558,27 @@ app.get('/api/chat/history/:email', async (req, res) => {
     }
 });
 
+    // pdf -id -> story from the content
+    app.get('/api/generate-story/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Find the document with the provided ID
+            const result = await generatedPDFs.findOne({ _id: new ObjectId(id) });
+
+            if (!result) {
+                return res.status(404).json({ error: 'PDF not found' });
+            }
+
+            const story = await makeStory(result.text);
+            const Bangla = await convert(story);
+            res.json({ story, Bangla });
+
+        } catch (error) {
+            console.error('Failed to get story:', error);
+            res.status(500).json({ error: 'Failed to get story' });
+        }
+    });
     
     
     } catch (e) {
