@@ -491,7 +491,6 @@ async function run() {
                 const { text, email } = req.body;
                 let input = text || '';
                 let context = '';
-        
                 // Handle PDF file if present
                 if (req.file && req.file.mimetype === 'application/pdf') {
                     const pdfText = await extractTextFromPDF(req.file.buffer);
