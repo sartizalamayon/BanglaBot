@@ -1,0 +1,103 @@
+.dashboard-content {
+  --background: #f5f5f5;
+}
+
+.stat-card {
+  margin: 8px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon {
+  font-size: 24px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.translation-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.translation-meta small {
+  color: #666;
+}
+
+.translation-meta ion-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.popular-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.popular-phrases ion-chip {
+  --background: transparent;
+  --color: var(--ion-color-primary);
+}
+
+.popular-phrases ion-badge {
+  margin-left: 8px;
+  padding: 4px 8px;
+}
+
+/* Card animations */
+.stat-card ion-card-content {
+  transition: transform 0.2s ease;
+}
+
+.stat-card:active ion-card-content {
+  transform: scale(0.98);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  ion-card {
+    margin: 8px;
+  }
+}
+
+/* Bangla text styling */
+h2 {
+  font-family: 'SolaimanLipi', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+/* Add some hover effects */
+ion-item {
+  --background-hover: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+ion-item:hover {
+  --background: #f5f5f5;
+}
