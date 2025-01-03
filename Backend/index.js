@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const PDFDocument = require('pdfkit');
+
 //
 const {
     GoogleGenerativeAI,
@@ -74,6 +76,52 @@ const visionModel = genAI.getGenerativeModel({
 });
 
 
+
+app.use(cors({
+    origin: '*',
+    credentials: true
+}));
+app.use(express.json());
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.b6ckjyi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
+
+async function convert(text) {
+    const chatSession = model.startChat({
+        generationConfig,
+        history: [
+            {
+                role: "user",
+                parts: [{ text: `I want you to convert this benglish text to plain bangla: ${text}` }],
+            }
+        ],
+    });
+
+    const result = await chatSession.sendMessage(text);
+    res = result.response.text();
+    return res;
+}
+
+async function generateMetadata(text) {
+    const chatSession = model.startChat({
+        generationConfig: generationTitleConfig,
+        history: [
+            {
+                role: "user",
+                parts: [
+                    {
+                        text: `The goal is to enable the model to generate an appropriate title, caption, and a possible file name(.pdf) for a given Bangla text or paragraph.`
+                    }
+                ]
+            }
+        ]
+    });
+
+    const result = await chatSession.sendMessage(text);
+    res = result.response.text();
+    return res;
+}
+
 async function extractAndConvertText(imageBuffer) {
     const base64Image = imageBuffer.toString('base64');
 
@@ -111,54 +159,7 @@ async function extractAndConvertText(imageBuffer) {
         throw error;
     }
 }
-
-
-app.use(cors({
-    origin: '*',
-    credentials: true
-}));
-app.use(express.json());
-
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.b6ckjyi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
-
-async function convert(text) {
-    const chatSession = model.startChat({
-        generationConfig,
-        history: [
-            {
-                role: "user",
-                parts: [{ text: `I want you to convert this benglish text to plain bangla: ${text}` }],
-            }
-        ],
-    });
-
-    const result = await chatSession.sendMessage(text);
-    res = result.response.text();
-    return res;
-}
-
-async function generateMetadata(text) {
-    const chatSession = model.startChat({
-        generationConfig: generationTitleConfig,
-        history: [
-            {
-                role: "user",
-                parts: [
-                    {
-                        text: `The goal is to enable the model to generate an appropriate title, caption, and a possible file name for a given Bangla text or paragraph.`
-                    }
-                ]
-            }
-        ]
-    });
-
-    const result = await chatSession.sendMessage(text);
-    res = result.response.text();
-    return res;
-}
   
-
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -175,6 +176,7 @@ async function run() {
 
         const db = client.db("BanglaBot"); // Database name
         const users = db.collection("users"); 
+        const generatedPDFs = db.collection("generatedPDFs");
 
 
         app.post('/api/convert', async (req, res) => {
@@ -193,7 +195,6 @@ async function run() {
             }
         });
 
-
         app.post('/api/generate-metadata', async (req, res) => {
             try {
                 const { text } = req.body;
@@ -211,8 +212,7 @@ async function run() {
                 res.status(500).json({ error: 'Metadata generation failed' });
             }
         });
-
-        const generatedPDFs = db.collection("generatedPDFs");
+  
 
         app.post('/api/generate_pdf', async (req, res) => {
         try {
@@ -251,6 +251,7 @@ async function run() {
             caption: metadata.caption || '',
             filename: metadata.file_name || '',  // Note: using file_name instead of filename to match the API response
             date: new Date(),
+            privacy: 'private'
         };
 
         console.log('Document to insert:', pdfDocument);  // Debug log
@@ -315,7 +316,8 @@ async function run() {
                 });
             }
         });
-
+        
+        // for dashboard - email e joto pdf asesob dekhabe
         app.get('/api/get-pdf/:email', async (req, res) => {
             try {
                 const { email } = req.params;
@@ -332,6 +334,79 @@ async function run() {
         }
         );
 
+        // to download a pdf
+        //first take the pdf id and get the pdf data
+        // then make a pdf file and send it to the user
+        app.get('/api/download-pdf/:id', async (req, res) => {
+            try {
+                const { id } = req.params;
+        
+                // Find the document with the provided ID
+                const result = await generatedPDFs.findOne({ _id: new ObjectId(id) });
+        
+                if (!result) {
+                    return res.status(404).json({ error: 'PDF not found' });
+                }
+        
+                // Create a PDF with UTF-8 encoding
+                const doc = new PDFDocument({
+                    size: 'A4',
+                    margin: 50,
+                    lang: 'bn',
+                    pdfVersion: '1.7',
+                    tagged: true
+                });
+
+                // Register and use the Bangla font
+                doc.registerFont('Kalpurush', 'fonts/kalpurush.ttf');
+
+                // Set response headers before piping
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename=${result.filename}.pdf`);
+
+                // Pipe the PDF to the response
+                doc.pipe(res);
+
+                // Add content with Bangla font
+                doc.font('Kalpurush')
+                   .fontSize(24)
+                   .text(result.title, {
+                       align: 'center'
+                   });
+
+                doc.moveDown();
+                
+                doc.fontSize(16)
+                   .text(result.caption, {
+                       align: 'center'
+                   });
+
+                doc.moveDown();
+
+                doc.fontSize(12)
+                   .text(result.text, {
+                       align: 'left',
+                       lineGap: 5
+                   });
+
+                // Add generation date at the bottom
+                doc.moveDown(2)
+                   .fontSize(10)
+                   .text(`Generated on: ${new Date().toLocaleString('bn-BD')}`, {
+                       align: 'left'
+                   });
+
+                doc.end();
+        
+            } catch (error) {
+                console.error('Failed to download PDF:', error);
+                res.status(500).json({ error: 'Failed to download PDF' });
+            }
+        });
+        
+
+
+
     
     } catch (e) {
         console.error(e);
@@ -345,5 +420,4 @@ app.listen(port, '0.0.0.0', () => {
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
-}
-);
+});
