@@ -1,0 +1,126 @@
+.region-map {
+  padding: 1rem;
+  background: #f5f5f5;
+  min-height: 50vh;
+}
+
+.badge-collection {
+  padding: 1rem;
+  background: white;
+}
+
+.badge-collection h2 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-family: 'SolaimanLipi', sans-serif;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.badge-item {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.badge-item:hover {
+  transform: translateY(-2px);
+}
+
+.badge-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-name {
+  font-size: 0.9rem;
+  color: #666;
+  font-family: 'SolaimanLipi', sans-serif;
+}
+
+.quest-challenge {
+  padding: 1rem;
+}
+
+.challenge-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.challenge-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.challenge-options {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.challenge-option {
+  --background: #ffffff;
+  --color: #333333;
+  --border-radius: 8px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: #ddd;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 1rem;
+  --padding-bottom: 1rem;
+  
+  font-family: 'SolaimanLipi', sans-serif;
+  text-align: left;
+}
+
+.challenge-option.selected {
+  --background: #e3f2fd;
+  --border-color: #2196f3;
+}
+
+.challenge-progress {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.region-locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.region-completed {
+  position: relative;
+}
+
+.region-completed::after {
+  content: '✓';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #4CAF50;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  }
+  
+  .badge-icon {
+    font-size: 2rem;
+  }
+  
+  .badge-name {
+    font-size: 0.8rem;
+  }
+}

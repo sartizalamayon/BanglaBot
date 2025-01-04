@@ -1,0 +1,36 @@
+.logout-button {
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
+  --color: #666;
+  height: 2.5rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.logout-button::after {
+  content: 'Logout';
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  bottom: -2rem;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.logout-button:hover {
+  --color: #ff3b30;
+}
+
+.logout-button:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.logout-button ion-icon {
+  font-size: 1.3rem;
+}

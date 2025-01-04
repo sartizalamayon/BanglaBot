@@ -31,6 +31,7 @@ import { alertController } from '@ionic/core';
 import { language, download, camera } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useAuth } from '../contexts/AuthContext';
+import LogoutButton from '../components/LogoutButton';
 import './Translation.css';
 
 // Use your computer's IP address when testing with live reload
@@ -233,7 +234,10 @@ const Translation = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Banglish Editor</IonTitle>
+          <IonTitle>Translation</IonTitle>
+          <IonButtons slot="end">
+            <LogoutButton />
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

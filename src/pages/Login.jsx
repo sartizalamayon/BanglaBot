@@ -95,24 +95,28 @@ const Login = () => {
                     </IonText>
                   )}
                   <form onSubmit={handleSubmit}>
-                    <IonItem>
-                      <IonLabel position="floating">Email</IonLabel>
+                    <IonItem lines="none">
+                      <IonLabel position="stacked">Email</IonLabel>
                       <IonInput
                         type="email"
                         value={email}
                         onIonChange={e => setEmail(e.detail.value)}
+                        placeholder="Enter your email"
                         required
+                        className="custom-input"
                         disabled={loading}
                         autocomplete="email"
                       />
                     </IonItem>
-                    <IonItem className="ion-margin-bottom">
-                      <IonLabel position="floating">Password</IonLabel>
+                    <IonItem lines="none" className="ion-margin-bottom">
+                      <IonLabel position="stacked">Password</IonLabel>
                       <IonInput
                         type="password"
                         value={password}
                         onIonChange={e => setPassword(e.detail.value)}
+                        placeholder="Enter your password"
                         required
+                        className="custom-input"
                         disabled={loading}
                         autocomplete="current-password"
                       />

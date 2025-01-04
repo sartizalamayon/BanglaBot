@@ -12,118 +12,172 @@
 }
 
 .upload-button {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #f0f0f0;
-  border-radius: 8px;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #007aff;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.2s ease;
+  border-radius: 50%;
 }
 
 .upload-button:hover {
-  background: #e0e0e0;
+  background: #f0f8ff;
 }
 
 .upload-button ion-icon {
-  font-size: 24px;
-  color: #666;
+  font-size: 1.3rem;
 }
 
-.selected-file {
+.upload-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.selected-file-banner {
+  background: #f0f8ff;
+  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px;
-  background: #f8f8f8;
-  border-radius: 8px;
-  font-size: 14px;
+  border-top: 1px solid #e0e8ef;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #007aff;
+  font-size: 0.9rem;
+}
+
+.file-info ion-icon {
+  font-size: 1.2rem;
+}
+
+.filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.remove-file-button {
+  --color: #ff3b30;
+  font-size: 0.9rem;
+  height: 2rem;
+}
+
+.remove-file-button ion-icon {
+  margin-right: 0.3rem;
 }
 
 .messages-container {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .message {
-  display: flex;
-  margin-bottom: 8px;
-}
-
-.message-content {
   max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 16px;
-  position: relative;
+  margin: 4px 0;
+  clear: both;
 }
 
 .user-message {
-  justify-content: flex-end;
+  float: right;
+  margin-left: auto;
+}
+
+.bot-message {
+  float: left;
+  margin-right: auto;
+}
+
+.message-content {
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+  word-wrap: break-word;
 }
 
 .user-message .message-content {
-  background: #0084ff;
+  background: var(--ion-color-primary);
   color: white;
   border-bottom-right-radius: 4px;
 }
 
 .bot-message .message-content {
   background: white;
-  color: #333;
+  color: var(--ion-color-dark);
   border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .timestamp {
-  font-size: 11px;
+  font-size: 0.7em;
   opacity: 0.7;
   margin-top: 4px;
   display: block;
 }
 
-.user-message .timestamp {
-  text-align: right;
-}
-
-.chat-footer {
-  background: white;
-  border-top: 1px solid #e0e0e0;
-  padding: 8px 16px;
-}
-
 .input-container {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  padding: 8px;
   background: white;
+  border-top: 1px solid #eee;
 }
 
 .chat-input {
   flex: 1;
-  background: #f5f5f5;
+  margin: 0 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --background: #f8f9fa;
   border-radius: 20px;
-  padding: 8px 16px;
-  margin: 0;
   max-height: 120px;
 }
 
-.send-button {
+ion-button {
   --padding-start: 8px;
   --padding-end: 8px;
-  margin: 0;
-  height: 40px;
 }
 
-.send-button ion-icon {
-  font-size: 24px;
-  color: #0084ff;
+/* Loading spinner styles */
+.bot-message ion-spinner {
+  margin: 8px;
+}
+
+/* Remove outline from buttons */
+ion-button::part(native) {
+  --ripple-color: transparent;
 }
 
 /* Loading animation */
-.bot-message ion-spinner {
-  color: #666;
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.bot-message .message-content ion-spinner {
+  animation: pulse 1.5s infinite;
 }
 
 /* Mobile optimizations */

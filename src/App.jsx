@@ -26,6 +26,7 @@ import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import ChatBot from './pages/ChatBot';
 import Dashboard from './pages/Dashboard';
+import LanguageQuest from './pages/LanguageQuest';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
 /* Core CSS required for Ionic components to work properly */
@@ -91,6 +92,7 @@ const AppContent = () => {
           <PrivateRoute exact path="/content" component={ContentManager} />
           <PrivateRoute exact path="/chatbot" component={ChatBot} />
           <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <PrivateRoute exact path="/language-quest" component={LanguageQuest} />
           <Route exact path="/">
             <Redirect to="/translation" />
           </Route>

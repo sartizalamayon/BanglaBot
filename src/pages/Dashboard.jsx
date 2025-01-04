@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
   IonContent,
   IonHeader,
@@ -29,7 +28,8 @@ import {
   IonSegmentButton,
   IonCardSubtitle,
   IonSkeletonText,
-  useIonLoading,
+  useIonAlert,
+  IonButtons,
 } from '@ionic/react';
 import {
   documentTextOutline,
@@ -42,6 +42,8 @@ import {
   analyticsOutline,
   documentsOutline,
 } from 'ionicons/icons';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import LogoutButton from '../components/LogoutButton';
 import './Dashboard.css';
 
 const API_URL = 'http://192.168.12.199:3000';
@@ -56,7 +58,7 @@ const Dashboard = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [searchText, setSearchText] = useState('');
   const [filter, setFilter] = useState('all');
-  const [present, dismiss] = useIonLoading();
+  const [presentAlert] = useIonAlert();
 
   const fetchPDFs = async () => {
     if (!currentUser?.email) return;
@@ -101,70 +103,80 @@ const Dashboard = () => {
     });
   };
 
-  const handleDownload = async (pdfId, filename) => {
+  const handleDownloadPDF = async (pdf) => {
     try {
-      await present({
-        message: 'Downloading PDF...',
-        duration: 0
-      });
-
       const baseUrl = isPlatform('hybrid') ? API_URL : WEB_URL;
-      const response = await fetch(`${baseUrl}/api/download-pdf/${pdfId}`);
+      const response = await fetch(`${baseUrl}/api/download-pdf/${pdf._id}`);
       
       if (!response.ok) {
         throw new Error('Failed to download PDF');
       }
 
-      const blob = await response.blob();
+      // Create filename with Bangla title
+      const timestamp = new Date().toISOString()
+        .replace(/[-:]/g, '')
+        .split('.')[0];
       
+      // Keep only Bangla characters and basic punctuation, remove any problematic characters
+      const cleanTitle = pdf.title
+        .trim()
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, '') // Remove invalid filename characters
+        .substring(0, 100); // Limit length to prevent issues
+      
+      const fileName = `${cleanTitle}_${timestamp}.pdf`;
+
       if (isPlatform('hybrid')) {
-        try {
-          // Convert blob to base64
-          const reader = new FileReader();
-          const base64Data = await new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
+        // For mobile: Save to device storage
+        const blob = await response.blob();
+        const reader = new FileReader();
+        
+        reader.onload = async () => {
+          try {
+            const base64Data = reader.result.split(',')[1];
+            
+            // For Android, we'll save with the encoded filename
+            const androidFileName = encodeURIComponent(fileName);
+            
+            await Filesystem.writeFile({
+              path: androidFileName,
+              data: base64Data,
+              directory: Directory.Documents,
+              recursive: true
+            });
 
-          // Remove the data URL prefix to get just the base64 string
-          const base64String = base64Data.split(',')[1];
+            presentAlert({
+              header: 'সফল',
+              message: `পিডিএফটি সফলভাবে ডাউনলোড হয়েছে!\nফাইল নাম: ${cleanTitle}`,
+              buttons: ['ঠিক আছে'],
+            });
+          } catch (error) {
+            console.error('Error saving file:', error);
+            setToastMessage('পিডিএফ সংরক্ষণ করা যায়নি');
+            setShowToast(true);
+          }
+        };
 
-          // Save file to device
-          const savedFile = await Filesystem.writeFile({
-            path: `${filename}.pdf`,
-            data: base64String,
-            directory: Directory.Documents,
-            recursive: true
-          });
-
-          setToastMessage('PDF saved to Documents folder');
-          setShowToast(true);
-
-        } catch (error) {
-          console.error('Mobile save error:', error);
-          throw new Error('Failed to save PDF on device');
-        }
+        reader.readAsDataURL(blob);
       } else {
-        // Web browser download
+        // For web: Use browser download with proper encoding
+        const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${filename || 'download'}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
         window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
 
-        setToastMessage('PDF downloaded successfully');
+        // Show success message
+        setToastMessage('পিডিএফ ডাউনলোড সম্পন্ন হয়েছে');
         setShowToast(true);
       }
     } catch (error) {
-      console.error('Download error:', error);
-      setToastMessage(`Failed to download PDF: ${error.message}`);
+      console.error('Error downloading PDF:', error);
+      setToastMessage('পিডিএফ ডাউনলোড করা যায়নি');
       setShowToast(true);
-    } finally {
-      await dismiss();
     }
   };
 
@@ -216,6 +228,9 @@ const Dashboard = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Dashboard</IonTitle>
+          <IonButtons slot="end">
+            <LogoutButton />
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="dashboard-content">
@@ -356,7 +371,7 @@ const Dashboard = () => {
                           <IonButton 
                             slot="end" 
                             fill="clear"
-                            onClick={() => handleDownload(pdf._id, pdf.title)}
+                            onClick={() => handleDownloadPDF(pdf)}
                             className="download-button"
                           >
                             <IonIcon icon={downloadOutline} slot="icon-only" />
@@ -377,7 +392,7 @@ const Dashboard = () => {
           message={toastMessage}
           duration={3000}
           position="bottom"
-          color={toastMessage.includes('success') ? 'success' : 'danger'}
+          color="danger"
         />
       </IonContent>
     </IonPage>
