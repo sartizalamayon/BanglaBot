@@ -36,6 +36,18 @@ const model = genAI.getGenerativeModel({
   model: "gemini-1.5-pro",
 });
 
+const generationConfig = {
+    temperature: 1.05,
+    responseMimeType: "application/json",
+    responseSchema: {
+      type: "object",
+      properties: {
+        convertedBangla: { type: "string" }
+      },
+      required: ["convertedBangla"]
+    }
+};
+
 
 const generationQuizConfig = {
     temperature: 1.05,
@@ -155,6 +167,7 @@ const upload = multer({
 const visionModel = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash" 
 });
+
 
 
 
